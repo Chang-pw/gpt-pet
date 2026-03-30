@@ -3,9 +3,23 @@ const PET_WIDTH = 56;
 const PET_HEIGHT = 76;
 const PET_TOP_OFFSET = 52;
 const PET_RIGHT_OFFSET = 28;
+const STORAGE_KEY = "gpt-pet-selected-pet";
+const DEFAULT_PET = "laifu";
+
+const PET_LIBRARY = {
+  laifu: {
+    file: "assets/laifu.webm",
+    label: "喵～我叫来福",
+  },
+  chris: {
+    file: "assets/chris.webm",
+    label: "喵～我是圣诞",
+  },
+};
 
 let anchor = null;
 let rafId = 0;
+let selectedPet = DEFAULT_PET;
 
 function isVisible(element) {
   if (!element) return false;
@@ -53,10 +67,10 @@ function ensureAnchor() {
         loop
         playsinline
         preload="auto"
-        src="${chrome.runtime.getURL("assets/laifu.webm")}"
+        src=""
       ></video>
       <canvas class="cgpt-pet-canvas" aria-hidden="true"></canvas>
-      <div class="cgpt-pet-tag">喵～我叫来福</div>
+      <div class="cgpt-pet-tag"></div>
     </div>
   `;
 
@@ -81,7 +95,35 @@ function ensureAnchor() {
   });
 
   document.body.appendChild(anchor);
+  applySelectedPet();
   return anchor;
+}
+
+async function loadSelectedPet() {
+  const result = await chrome.storage.sync.get(STORAGE_KEY);
+  selectedPet = result[STORAGE_KEY] || DEFAULT_PET;
+}
+
+function getPetConfig() {
+  return PET_LIBRARY[selectedPet] || PET_LIBRARY[DEFAULT_PET];
+}
+
+function applySelectedPet() {
+  if (!anchor) return;
+
+  const pet = getPetConfig();
+  const video = anchor.querySelector(".cgpt-pet-video");
+  const tag = anchor.querySelector(".cgpt-pet-tag");
+
+  if (tag) {
+    tag.textContent = pet.label;
+  }
+
+  const nextSrc = chrome.runtime.getURL(pet.file);
+  if (video && video.getAttribute("src") !== nextSrc) {
+    video.src = nextSrc;
+    video.load();
+  }
 }
 
 function positionAnchor(surface) {
@@ -176,5 +218,16 @@ observer.observe(document.documentElement, {
 window.addEventListener("resize", scheduleSync, { passive: true });
 window.addEventListener("scroll", scheduleSync, { passive: true, capture: true });
 window.addEventListener("load", scheduleSync);
+chrome.storage.onChanged.addListener((changes, areaName) => {
+  if (areaName !== "sync" || !changes[STORAGE_KEY]) return;
+  selectedPet = changes[STORAGE_KEY].newValue || DEFAULT_PET;
+  applySelectedPet();
+});
 
-scheduleSync();
+loadSelectedPet()
+  .then(() => {
+    scheduleSync();
+  })
+  .catch(() => {
+    scheduleSync();
+  });

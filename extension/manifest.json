@@ -3,6 +3,19 @@
   "name": "ChatGPT Button Pet",
   "version": "0.1.0",
   "description": "Attach a small pet above the ChatGPT send button.",
+  "permissions": [
+    "storage"
+  ],
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_title": "GPT Pet",
+    "default_popup": "popup.html"
+  },
   "content_scripts": [
     {
       "matches": [
@@ -20,8 +33,8 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "assets/cat-pet.webm",
-        "assets/laifu.webm"
+        "assets/laifu.webm",
+        "assets/chris.webm"
       ],
       "matches": [
         "https://chatgpt.com/*"

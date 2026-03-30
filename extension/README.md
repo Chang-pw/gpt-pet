@@ -11,6 +11,10 @@
 - `content.js`
 - `content.css`
 - `assets/laifu.webm`
+- `assets/chris.webm`
+- `popup.html`
+- `popup.css`
+- `popup.js`
 
 ### 安装方式
 
@@ -30,6 +34,10 @@ The extension places a small pet above the ChatGPT composer on `chatgpt.com`.
 - `content.js`
 - `content.css`
 - `assets/laifu.webm`
+- `assets/chris.webm`
+- `popup.html`
+- `popup.css`
+- `popup.js`
 
 ### Installation
 

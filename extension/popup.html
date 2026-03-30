@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GPT Pet</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <main class="popup">
+      <div class="eyebrow">GPT Pet</div>
+      <h1 class="title">Choose Your Pet</h1>
+      <p class="subtitle">Switch the pet shown above the ChatGPT composer.</p>
+
+      <label class="label" for="pet-select">Current pet</label>
+      <select id="pet-select" class="select">
+        <option value="laifu">LaiFu</option>
+        <option value="chris">Chris</option>
+      </select>
+
+      <p id="status" class="status">Saved automatically.</p>
+    </main>
+
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>
