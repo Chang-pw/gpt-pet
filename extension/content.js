@@ -56,7 +56,7 @@ function ensureAnchor() {
         src="${chrome.runtime.getURL("assets/laifu.webm")}"
       ></video>
       <canvas class="cgpt-pet-canvas" aria-hidden="true"></canvas>
-      <div class="cgpt-pet-tag">对话框守护中</div>
+      <div class="cgpt-pet-tag">喵～我叫来福</div>
     </div>
   `;
 
