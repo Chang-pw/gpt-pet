@@ -24,6 +24,7 @@
 }
 
 .cgpt-pet-shell {
+  --pet-scale: 1;
   position: absolute;
   inset: 0;
   display: flex;
@@ -33,23 +34,27 @@
 
 .cgpt-pet-video {
   position: relative;
-  width: var(--cgpt-pet-width);
-  height: var(--cgpt-pet-height);
+  width: 100%;
+  height: 100%;
   object-fit: contain;
   background: transparent;
   filter: drop-shadow(var(--cgpt-pet-shadow));
   pointer-events: auto;
   cursor: pointer;
+  transform: scale(var(--pet-scale));
+  transform-origin: center bottom;
   animation: cgpt-pet-float 3.3s ease-in-out infinite;
 }
 
 .cgpt-pet-canvas {
   position: absolute;
   inset: 0;
-  width: var(--cgpt-pet-width);
-  height: var(--cgpt-pet-height);
+  width: 100%;
+  height: 100%;
   pointer-events: auto;
   filter: drop-shadow(var(--cgpt-pet-shadow));
+  transform: scale(var(--pet-scale));
+  transform-origin: center bottom;
   animation: cgpt-pet-float 3.3s ease-in-out infinite;
 }
 

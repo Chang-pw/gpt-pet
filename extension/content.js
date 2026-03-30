@@ -1,6 +1,7 @@
 const ANCHOR_ID = "cgpt-pet-anchor";
-const PET_WIDTH = 56;
-const PET_HEIGHT = 76;
+const DEFAULT_PET_MAX_WIDTH = 56;
+const DEFAULT_PET_MAX_HEIGHT = 76;
+const DESPILL_RENDER_SCALE = 4;
 const PET_TOP_OFFSET = 52;
 const PET_RIGHT_OFFSET = 28;
 const STORAGE_KEY = "gpt-pet-selected-pet";
@@ -10,16 +11,33 @@ const PET_LIBRARY = {
   laifu: {
     file: "assets/laifu.webm",
     label: "喵～我叫来福",
+    despill: true,
+    maxWidth: 56,
+    maxHeight: 76,
   },
   chris: {
     file: "assets/chris.webm",
     label: "喵～我是圣诞",
+    despill: true,
+    maxWidth: 56,
+    maxHeight: 76,
+  },
+  xiaoxiao: {
+    file: "assets/xiaoxiao.webm",
+    label: "喵～我是小小",
+    despill: true,
+    maxWidth: 82,
+    maxHeight: 82,
   },
 };
 
 let anchor = null;
 let rafId = 0;
 let selectedPet = DEFAULT_PET;
+let currentPetSize = {
+  width: DEFAULT_PET_MAX_WIDTH,
+  height: DEFAULT_PET_MAX_HEIGHT,
+};
 
 function isVisible(element) {
   if (!element) return false;
@@ -86,6 +104,10 @@ function ensureAnchor() {
 
   const video = anchor.querySelector(".cgpt-pet-video");
   const canvas = anchor.querySelector(".cgpt-pet-canvas");
+  video.addEventListener("loadedmetadata", () => {
+    updatePetSize(video);
+    scheduleSync();
+  });
   video.addEventListener("loadeddata", () => {
     video.play().catch(() => {});
     startDespillPass(video, canvas);
@@ -100,7 +122,7 @@ function ensureAnchor() {
 }
 
 async function loadSelectedPet() {
-  const result = await chrome.storage.sync.get(STORAGE_KEY);
+  const result = await chrome.storage.sync.get([STORAGE_KEY]);
   selectedPet = result[STORAGE_KEY] || DEFAULT_PET;
 }
 
@@ -108,15 +130,44 @@ function getPetConfig() {
   return PET_LIBRARY[selectedPet] || PET_LIBRARY[DEFAULT_PET];
 }
 
+function updatePetSize(video) {
+  if (!anchor || !video.videoWidth || !video.videoHeight) return;
+  const pet = getPetConfig();
+  const maxWidth = pet.maxWidth || DEFAULT_PET_MAX_WIDTH;
+  const maxHeight = pet.maxHeight || DEFAULT_PET_MAX_HEIGHT;
+
+  const scale = Math.min(
+    maxWidth / video.videoWidth,
+    maxHeight / video.videoHeight
+  );
+
+  currentPetSize = {
+    width: Math.max(1, Math.round(video.videoWidth * scale)),
+    height: Math.max(1, Math.round(video.videoHeight * scale)),
+  };
+
+  anchor.style.setProperty("--cgpt-pet-width", `${currentPetSize.width}px`);
+  anchor.style.setProperty("--cgpt-pet-height", `${currentPetSize.height}px`);
+}
+
 function applySelectedPet() {
   if (!anchor) return;
 
   const pet = getPetConfig();
   const video = anchor.querySelector(".cgpt-pet-video");
+  const canvas = anchor.querySelector(".cgpt-pet-canvas");
   const tag = anchor.querySelector(".cgpt-pet-tag");
 
   if (tag) {
     tag.textContent = pet.label;
+  }
+
+  if (video) {
+    video.style.opacity = pet.despill ? "0" : "1";
+  }
+
+  if (canvas) {
+    canvas.style.opacity = pet.despill ? "1" : "0";
   }
 
   const nextSrc = chrome.runtime.getURL(pet.file);
@@ -129,11 +180,15 @@ function applySelectedPet() {
 function positionAnchor(surface) {
   const node = ensureAnchor();
   const rect = surface.getBoundingClientRect();
+  const baseHeight = getPetConfig().maxHeight || DEFAULT_PET_MAX_HEIGHT;
   const left = Math.max(
     12,
-    Math.min(rect.right - PET_RIGHT_OFFSET - PET_WIDTH, window.innerWidth - PET_WIDTH - 12)
+    Math.min(
+      rect.right - PET_RIGHT_OFFSET - currentPetSize.width,
+      window.innerWidth - currentPetSize.width - 12
+    )
   );
-  const top = Math.max(12, rect.top - PET_TOP_OFFSET);
+  const top = Math.max(12, rect.top - PET_TOP_OFFSET - (currentPetSize.height - baseHeight));
 
   node.style.left = `${left}px`;
   node.style.top = `${top}px`;
@@ -162,17 +217,36 @@ function scheduleSync() {
 }
 
 function startDespillPass(video, canvas) {
+  const pet = getPetConfig();
   const ctx = canvas.getContext("2d", { willReadFrequently: true });
   if (!ctx) return;
 
-  canvas.width = 166;
-  canvas.height = 224;
+  const renderWidth = Math.max(
+    currentPetSize.width,
+    Math.round(currentPetSize.width * DESPILL_RENDER_SCALE)
+  );
+  const renderHeight = Math.max(
+    currentPetSize.height,
+    Math.round(currentPetSize.height * DESPILL_RENDER_SCALE)
+  );
+
+  canvas.width = renderWidth;
+  canvas.height = renderHeight;
 
   const render = () => {
     if (!anchor?.isConnected) return;
+    if (!getPetConfig().despill) {
+      requestAnimationFrame(render);
+      return;
+    }
     if (video.readyState < 2 || video.videoWidth === 0 || video.videoHeight === 0) {
       requestAnimationFrame(render);
       return;
+    }
+
+    if (canvas.width !== renderWidth || canvas.height !== renderHeight) {
+      canvas.width = renderWidth;
+      canvas.height = renderHeight;
     }
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -203,7 +277,8 @@ function startDespillPass(video, canvas) {
     requestAnimationFrame(render);
   };
 
-  video.style.opacity = "0";
+  video.style.opacity = pet.despill ? "0" : "1";
+  canvas.style.opacity = pet.despill ? "1" : "0";
   requestAnimationFrame(render);
 }
 
@@ -219,9 +294,13 @@ window.addEventListener("resize", scheduleSync, { passive: true });
 window.addEventListener("scroll", scheduleSync, { passive: true, capture: true });
 window.addEventListener("load", scheduleSync);
 chrome.storage.onChanged.addListener((changes, areaName) => {
-  if (areaName !== "sync" || !changes[STORAGE_KEY]) return;
-  selectedPet = changes[STORAGE_KEY].newValue || DEFAULT_PET;
-  applySelectedPet();
+  if (areaName !== "sync") return;
+
+  if (changes[STORAGE_KEY]) {
+    selectedPet = changes[STORAGE_KEY].newValue || DEFAULT_PET;
+    applySelectedPet();
+    scheduleSync();
+  }
 });
 
 loadSelectedPet()

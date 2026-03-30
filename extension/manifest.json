@@ -34,7 +34,8 @@
     {
       "resources": [
         "assets/laifu.webm",
-        "assets/chris.webm"
+        "assets/chris.webm",
+        "assets/xiaoxiao.webm"
       ],
       "matches": [
         "https://chatgpt.com/*"

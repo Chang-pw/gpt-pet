@@ -4,9 +4,11 @@ const DEFAULT_PET = "laifu";
 const selectEl = document.getElementById("pet-select");
 const statusEl = document.getElementById("status");
 
-async function readSelectedPet() {
-  const result = await chrome.storage.sync.get(STORAGE_KEY);
-  return result[STORAGE_KEY] || DEFAULT_PET;
+async function readSettings() {
+  const result = await chrome.storage.sync.get([STORAGE_KEY]);
+  return {
+    pet: result[STORAGE_KEY] || DEFAULT_PET,
+  };
 }
 
 async function saveSelectedPet(value) {
@@ -18,8 +20,8 @@ function setStatus(message) {
 }
 
 async function init() {
-  const currentPet = await readSelectedPet();
-  selectEl.value = currentPet;
+  const { pet } = await readSettings();
+  selectEl.value = pet;
   setStatus("Saved automatically.");
 }
 

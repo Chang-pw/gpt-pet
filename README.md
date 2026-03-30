@@ -11,6 +11,7 @@
 - 将宠物固定在输入框上方偏右的位置
 - 支持透明 `WebM` 视频宠物
 - 当前默认宠物素材为 `来福`
+- 支持在插件弹窗里切换内置宠物
 - 点击宠物时会触发轻微的跳动反馈
 - 对带少量绿边的视频做轻度去溢色处理
 
@@ -24,6 +25,12 @@
   宠物样式与动画
 - `extension/assets/laifu.webm`
   默认宠物素材
+- `extension/assets/chris.webm`
+  第二个内置宠物素材
+- `extension/popup.html`
+  插件弹窗界面
+- `extension/popup.js`
+  宠物切换逻辑
 
 ### 安装使用
 
@@ -34,17 +41,26 @@
    `/Users/zbw/Documents/New project/extension`
 5. 打开或刷新 `https://chatgpt.com`
 
-### 自定义宠物
+### 手动新增宠物
 
-如果你想替换默认宠物：
+如果你想在文件里新增一个宠物，而不是替换现有素材，需要改这四处：
 
-1. 准备一个透明背景的 `WebM` 视频
-2. 替换 [laifu.webm](/Users/zbw/Documents/New%20project/extension/assets/laifu.webm)
-3. 如有需要，调整 [content.js](/Users/zbw/Documents/New%20project/extension/content.js) 里的参数：
-   `PET_WIDTH`
-   `PET_HEIGHT`
-   `PET_TOP_OFFSET`
-   `PET_RIGHT_OFFSET`
+1. 把新的透明 `WebM` 放进 `extension/assets/`
+   例如：`extension/assets/mimi.webm`
+2. 在 [manifest.json](/Users/zbw/Documents/New%20project/extension/manifest.json) 的 `web_accessible_resources` 里加入新文件
+3. 在 [content.js](/Users/zbw/Documents/New%20project/extension/content.js) 的 `PET_LIBRARY` 里加入新宠物配置
+4. 在 [popup.html](/Users/zbw/Documents/New%20project/extension/popup.html) 的下拉框里新增一个 `option`
+
+示例：
+
+- `manifest.json`
+  加入 `"assets/mimi.webm"`
+- `content.js`
+  加入 `mimi: { file: "assets/mimi.webm", label: "喵～我是Mimi" }`
+- `popup.html`
+  加入 `<option value="mimi">Mimi</option>`
+
+如果你只是想替换默认宠物，那么只需要直接替换 [laifu.webm](/Users/zbw/Documents/New%20project/extension/assets/laifu.webm)。
 
 ### 说明
 
@@ -63,6 +79,7 @@ It places a small animated pet above the ChatGPT composer and supports transpare
 - Pins the pet above the input area near the top-right corner
 - Supports transparent `WebM` pet videos
 - Uses `LaiFu` as the default pet asset
+- Supports switching between built-in pets in the popup
 - Plays a small hop animation when the pet is clicked
 - Applies a light despill pass for videos with minor green edge spill
 
@@ -76,6 +93,12 @@ It places a small animated pet above the ChatGPT composer and supports transpare
   Pet styling and animation
 - `extension/assets/laifu.webm`
   Default pet asset
+- `extension/assets/chris.webm`
+  Second built-in pet asset
+- `extension/popup.html`
+  Extension popup UI
+- `extension/popup.js`
+  Pet switching logic
 
 ### Installation
 
@@ -86,17 +109,26 @@ It places a small animated pet above the ChatGPT composer and supports transpare
    `/Users/zbw/Documents/New project/extension`
 5. Open or refresh `https://chatgpt.com`
 
-### Replace the Pet
+### Add a New Pet Manually
 
-To use your own pet asset:
+If you want to add a new pet in the files instead of replacing an existing one, update these four places:
 
-1. Prepare a transparent-background `WebM`
-2. Replace [laifu.webm](/Users/zbw/Documents/New%20project/extension/assets/laifu.webm)
-3. If needed, tweak these values in [content.js](/Users/zbw/Documents/New%20project/extension/content.js):
-   `PET_WIDTH`
-   `PET_HEIGHT`
-   `PET_TOP_OFFSET`
-   `PET_RIGHT_OFFSET`
+1. Put a new transparent `WebM` into `extension/assets/`
+   Example: `extension/assets/mimi.webm`
+2. Add the file to `web_accessible_resources` in [manifest.json](/Users/zbw/Documents/New%20project/extension/manifest.json)
+3. Add a new pet entry to `PET_LIBRARY` in [content.js](/Users/zbw/Documents/New%20project/extension/content.js)
+4. Add a new `<option>` to the dropdown in [popup.html](/Users/zbw/Documents/New%20project/extension/popup.html)
+
+Example:
+
+- `manifest.json`
+  add `"assets/mimi.webm"`
+- `content.js`
+  add `mimi: { file: "assets/mimi.webm", label: "Meow, I'm Mimi" }`
+- `popup.html`
+  add `<option value="mimi">Mimi</option>`
+
+If you only want to replace the default pet, you can simply replace [laifu.webm](/Users/zbw/Documents/New%20project/extension/assets/laifu.webm).
 
 ### Notes
 
