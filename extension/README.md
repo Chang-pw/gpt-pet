@@ -1,24 +1,39 @@
-# ChatGPT Button Pet Extension
+# GPT Pet Extension
 
-This directory contains a minimal Chrome-compatible extension that injects a small pet above the ChatGPT send button.
+## 中文
 
-## Load it locally
+这是 `GPT Pet` 的浏览器扩展目录。  
+扩展会在 `chatgpt.com` 的对话框上方显示一个小宠物。
 
-1. Open your Chromium-based browser extension page.
-2. Enable developer mode.
-3. Choose `Load unpacked`.
-4. Select this folder:
-   - `/Users/zbw/Documents/New project/extension`
+### 主要文件
 
-## Current behavior
+- `manifest.json`
+- `content.js`
+- `content.css`
+- `assets/laifu.webm`
 
-- Finds the active ChatGPT composer form
-- Locates the send button using multiple heuristics
-- Pins a small pet above that button
-- Repositions on layout changes, scrolling, and composer rerenders
-- Clicking the pet triggers a small hop animation
+### 安装方式
 
-## Notes
+1. 打开浏览器扩展页面
+2. 开启开发者模式
+3. 点击“加载已解压的扩展程序”
+4. 选择当前目录
 
-- This does not modify ChatGPT itself; it overlays a local extension UI on top of the page.
-- The button selector is heuristic-based because the ChatGPT DOM can change over time.
+## English
+
+This folder contains the browser extension for `GPT Pet`.  
+The extension places a small pet above the ChatGPT composer on `chatgpt.com`.
+
+### Main Files
+
+- `manifest.json`
+- `content.js`
+- `content.css`
+- `assets/laifu.webm`
+
+### Installation
+
+1. Open your browser extensions page
+2. Enable Developer Mode
+3. Click `Load unpacked`
+4. Select this folder
